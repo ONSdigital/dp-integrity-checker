@@ -1,0 +1,15 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: onsdigital/dp-concourse-tools-nancy
+    tag: latest
+
+inputs:
+  - name: dp-integrity-checker
+    path: dp-integrity-checker
+
+run:
+  path: dp-integrity-checker/ci/scripts/audit.sh

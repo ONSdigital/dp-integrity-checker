@@ -1,0 +1,18 @@
+---
+
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: golang
+    tag: 1.19.5
+
+inputs:
+  - name: dp-integrity-checker
+
+caches:
+  - path: go/
+
+run:
+  path: dp-integrity-checker/ci/scripts/unit.sh
