@@ -1,17 +1,11 @@
 package config
 
 import (
-	"time"
-
 	"github.com/kelseyhightower/envconfig"
 )
 
 // Config represents service configuration for dp-integrity-checker
 type Config struct {
-	BindAddr                   string        `envconfig:"BIND_ADDR"`
-	GracefulShutdownTimeout    time.Duration `envconfig:"GRACEFUL_SHUTDOWN_TIMEOUT"`
-	HealthCheckInterval        time.Duration `envconfig:"HEALTHCHECK_INTERVAL"`
-	HealthCheckCriticalTimeout time.Duration `envconfig:"HEALTHCHECK_CRITICAL_TIMEOUT"`
 }
 
 var cfg *Config
@@ -23,12 +17,7 @@ func Get() (*Config, error) {
 		return cfg, nil
 	}
 
-	cfg = &Config{
-		BindAddr:                   "localhost:",
-		GracefulShutdownTimeout:    5 * time.Second,
-		HealthCheckInterval:        30 * time.Second,
-		HealthCheckCriticalTimeout: 90 * time.Second,
-	}
+	cfg = &Config{}
 
 	return cfg, envconfig.Process("", cfg)
 }

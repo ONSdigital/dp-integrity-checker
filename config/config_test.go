@@ -1,11 +1,9 @@
 package config
 
 import (
+	. "github.com/smartystreets/goconvey/convey"
 	"os"
 	"testing"
-	"time"
-
-	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestConfig(t *testing.T) {
@@ -23,12 +21,7 @@ func TestConfig(t *testing.T) {
 			Convey("Then there should be no error returned, and values are as expected", func() {
 				configuration, err = Get() // This Get() is only called once, when inside this function
 				So(err, ShouldBeNil)
-				So(configuration, ShouldResemble, &Config{
-					BindAddr:                   "localhost:",
-					GracefulShutdownTimeout:    5 * time.Second,
-					HealthCheckInterval:        30 * time.Second,
-					HealthCheckCriticalTimeout: 90 * time.Second,
-				})
+				So(configuration, ShouldResemble, &Config{})
 			})
 
 			Convey("Then a second call to config should return the same config", func() {
