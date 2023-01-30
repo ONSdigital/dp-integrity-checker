@@ -1,5 +1,5 @@
 job "dp-integrity-checker" {
-  datacenters = ["eu-west-1"]
+  datacenters = ["eu-west-2"]
   region      = "eu"
   type        = "batch"
 
@@ -7,14 +7,6 @@ job "dp-integrity-checker" {
     cron             = "0 0 1 * * 1-5 *"
     time_zone = "UTC"
     prohibit_overlap = true
-  }
-
-  update {
-    stagger          = "60s"
-    min_healthy_time = "30s"
-    healthy_deadline = "2m"
-    max_parallel     = 1
-    auto_revert      = true
   }
 
   group "publishing" {
@@ -36,7 +28,7 @@ job "dp-integrity-checker" {
       driver = "docker"
 
       artifact {
-        source = "s3::https://s3-eu-west-1.amazonaws.com/{{DEPLOYMENT_BUCKET}}/dp-integrity-checker/{{PROFILE}}/{{RELEASE}}.tar.gz"
+        source = "s3::https://s3-eu-west-2.amazonaws.com/{{DEPLOYMENT_BUCKET}}/dp-integrity-checker/{{PROFILE}}/{{RELEASE}}.tar.gz"
       }
 
       config {
