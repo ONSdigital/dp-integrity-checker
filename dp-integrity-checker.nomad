@@ -47,19 +47,6 @@ job "dp-integrity-checker" {
         image = "{{ECR_URL}}:concourse-{{REVISION}}"
       }
 
-      service {
-        name = "dp-integrity-checker"
-        port = "http"
-        tags = ["publishing"]
-
-        check {
-          type     = "http"
-          path     = "/health"
-          interval = "10s"
-          timeout  = "2s"
-        }
-      }
-
       resources {
         cpu    = "{{PUBLISHING_RESOURCE_CPU}}"
         memory = "{{PUBLISHING_RESOURCE_MEM}}"
