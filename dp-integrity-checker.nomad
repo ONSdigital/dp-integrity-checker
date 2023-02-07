@@ -4,8 +4,8 @@ job "dp-integrity-checker" {
   type        = "batch"
 
   periodic {
-    cron             = "0 0 1 * * 1-5 *"
-    time_zone = "UTC"
+    cron             = "0 0 1 * * * *"
+    time_zone        = "UTC"
     prohibit_overlap = true
   }
 
@@ -14,7 +14,7 @@ job "dp-integrity-checker" {
 
     constraint {
       attribute = "${node.class}"
-      value     = "publishing"
+      value     = "publishing-mount"
     }
 
     restart {
@@ -37,6 +37,15 @@ job "dp-integrity-checker" {
         args = ["./dp-integrity-checker"]
 
         image = "{{ECR_URL}}:concourse-{{REVISION}}"
+
+        mounts = [
+          {
+            type     = "bind"
+            target   = "/content"
+            source   = "/var/florence"
+            readonly = false
+          }
+        ]
       }
 
       resources {

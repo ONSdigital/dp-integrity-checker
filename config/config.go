@@ -6,6 +6,7 @@ import (
 
 // Config represents service configuration for dp-integrity-checker
 type Config struct {
+	ZebedeeRoot string `envconfig:"ZEBEDEE_ROOT"`
 }
 
 var cfg *Config
@@ -17,7 +18,9 @@ func Get() (*Config, error) {
 		return cfg, nil
 	}
 
-	cfg = &Config{}
+	cfg = &Config{
+		ZebedeeRoot: "content",
+	}
 
 	return cfg, envconfig.Process("", cfg)
 }

@@ -24,7 +24,7 @@ build:
 .PHONY: debug
 debug:
 	go build -tags 'debug' $(LDFLAGS) -o $(BINPATH)/dp-integrity-checker
-	HUMAN_LOG=1 DEBUG=1 $(BINPATH)/dp-integrity-checker
+	HUMAN_LOG=1 DEBUG=1 ZEBEDEE_ROOT=${zebedee_root} $(BINPATH)/dp-integrity-checker
 
 .PHONY: test
 test:
