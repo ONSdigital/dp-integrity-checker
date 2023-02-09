@@ -48,7 +48,7 @@ func run(ctx context.Context) error {
 
 	// Run the checker in the background, using a result channel and an error channel for fatal errors
 	errChan := make(chan error, 1)
-	resultChan := make(chan checker.Result, 1)
+	resultChan := make(chan *checker.Result, 1)
 	go func() {
 		result, err := chk.Run(ctx)
 		if err != nil {

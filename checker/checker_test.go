@@ -10,6 +10,28 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+func TestRun_Unreadable(t *testing.T) {
+	os.Clearenv()
+
+	Convey("Given a checker on an unreadable directory", t, func() {
+		tempZebedeeRoot, err := os.CreateTemp("", "checkertest")
+		So(err, ShouldBeNil)
+		defer os.Remove(tempZebedeeRoot.Name())
+
+		chk := checker.New(context.Background(), tempZebedeeRoot.Name())
+
+		Convey("When the the checker is run", func() {
+			res, err := chk.Run(context.Background())
+
+			Convey("Then the checker should return an error", func() {
+				So(res, ShouldBeNil)
+				So(err, ShouldNotBeNil)
+				So(err.Error(), ShouldContainSubstring, "/zebedee/master: not a directory")
+			})
+		})
+	})
+}
+
 func TestRun_EmptyWorkspace(t *testing.T) {
 	os.Clearenv()
 
