@@ -22,7 +22,9 @@ func TestConfig(t *testing.T) {
 				configuration, err = Get() // This Get() is only called once, when inside this function
 				So(err, ShouldBeNil)
 				So(configuration, ShouldResemble, &Config{
-					ZebedeeRoot: "content"},
+					ZebedeeRoot:                "content",
+					CheckPublishedPreviousDays: 1,
+				},
 				)
 			})
 

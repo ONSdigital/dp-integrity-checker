@@ -6,7 +6,8 @@ import (
 
 // Config represents service configuration for dp-integrity-checker
 type Config struct {
-	ZebedeeRoot string `envconfig:"ZEBEDEE_ROOT"`
+	ZebedeeRoot                string `envconfig:"ZEBEDEE_ROOT"`
+	CheckPublishedPreviousDays int    `envconfig:"CHECK_PUBLISHED_PREVIOUS_DAYS"`
 }
 
 var cfg *Config
@@ -19,7 +20,8 @@ func Get() (*Config, error) {
 	}
 
 	cfg = &Config{
-		ZebedeeRoot: "content",
+		ZebedeeRoot:                "content",
+		CheckPublishedPreviousDays: 1,
 	}
 
 	return cfg, envconfig.Process("", cfg)

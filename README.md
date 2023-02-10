@@ -12,9 +12,10 @@ Periodic nomad job for checking integrity of zebedee workspace
 
 ### Configuration
 
-| Environment variable | Default   | Description                 |
-|----------------------|-----------|-----------------------------|
-| ZEBEDEE_ROOT         | "content" | Root of the zebedee-content |
+| Environment variable          | Default   | Description                                                |
+|-------------------------------|-----------|------------------------------------------------------------|
+| ZEBEDEE_ROOT                  | "content" | Root of the zebedee-content                                |
+| CHECK_PUBLISHED_PREVIOUS_DAYS | 1         | Number of previous days to check published collections for |
 
 NB. For developers the zebedee root is usually specified in the lowercase `zebedee_root` env so this service aliases
 this in the `make debug` target to make local development more straightforward.

@@ -44,7 +44,10 @@ func run(ctx context.Context) error {
 	}
 	log.Info(ctx, "config on startup", log.Data{"config": cfg, "build_time": BuildTime, "git-commit": GitCommit})
 
-	chk := checker.New(ctx, cfg.ZebedeeRoot)
+	chk := checker.Checker{
+		ZebedeeRoot:                cfg.ZebedeeRoot,
+		CheckPublishedPreviousDays: cfg.CheckPublishedPreviousDays,
+	}
 
 	// Run the checker in the background, using a result channel and an error channel for fatal errors
 	errChan := make(chan error, 1)
