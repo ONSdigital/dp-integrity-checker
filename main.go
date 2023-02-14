@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/ONSdigital/dp-integrity-checker/notification"
 	"os"
 	"os/signal"
 
@@ -44,6 +45,15 @@ func run(ctx context.Context) error {
 	}
 	log.Info(ctx, "config on startup", log.Data{"config": cfg, "build_time": BuildTime, "git-commit": GitCommit})
 
+	var notifier notification.Notifier
+	if cfg.SlackEnabled {
+		notifier = &notification.SlackNotifier{
+			Config: cfg.SlackConfig,
+		}
+	} else {
+		notifier = &notification.NullNotifier{}
+	}
+
 	chk := checker.Checker{
 		ZebedeeRoot:                cfg.ZebedeeRoot,
 		CheckPublishedPreviousDays: cfg.CheckPublishedPreviousDays,
@@ -64,10 +74,19 @@ func run(ctx context.Context) error {
 	select {
 	case err := <-errChan:
 		log.Error(ctx, "checker error received", err)
+		return err
 	case sig := <-signals:
 		log.Info(ctx, "os signal received", log.Data{"signal": sig})
 	case result := <-resultChan:
-		log.Info(ctx, "integrity check complete", log.Data{"Result": result})
+		log.Info(ctx, "integrity check result", log.Data{"Result": result})
+		if !result.Success {
+			err = notifier.SendCheckerResult(ctx, result)
+			if err != nil {
+				log.Error(ctx, "unable to send notification of result", err)
+				return err
+			}
+		}
+		log.Info(ctx, "integrity check complete")
 	}
 	return nil // TODO close down the checker and confirm task completion state (err or nil)
 }

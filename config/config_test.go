@@ -24,6 +24,13 @@ func TestConfig(t *testing.T) {
 				So(configuration, ShouldResemble, &Config{
 					ZebedeeRoot:                "content",
 					CheckPublishedPreviousDays: 1,
+					SlackEnabled:               false,
+					SlackConfig: Slack{
+						ApiToken:     "",
+						UserName:     "Integrity Checker",
+						AlarmChannel: "#sandbox-alarm",
+						AlarmEmoji:   ":rotating_light:",
+					},
 				},
 				)
 			})
