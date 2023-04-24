@@ -5,6 +5,7 @@ import (
 	"github.com/ONSdigital/dp-integrity-checker/notification"
 	"os"
 	"os/signal"
+	"syscall"
 
 	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/pkg/errors"
@@ -36,7 +37,7 @@ func main() {
 
 func run(ctx context.Context) error {
 	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, os.Interrupt, os.Kill)
+	signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
 
 	// Read config
 	cfg, err := config.Get()

@@ -12,10 +12,23 @@ import (
 
 	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/pkg/errors"
+
+	"github.com/ONSdigital/dp-integrity-checker/zebedee"
 )
 
 // Replacable function to allow for unit testing
 var Now = func() time.Time { return time.Now().UTC() }
+
+type allDeleted []string
+
+func (a allDeleted) includes(s string) bool {
+	for _, d := range a {
+		if d == s {
+			return true
+		}
+	}
+	return false
+}
 
 func (c *Checker) CheckPublishedCollections(ctx context.Context) (bool, error) {
 	log.Info(ctx, "checking consistency of published collections")
@@ -25,8 +38,15 @@ func (c *Checker) CheckPublishedCollections(ctx context.Context) (bool, error) {
 	}
 
 	valid := true
-	for _, collection := range collections {
-		colvalid, err := c.CheckPublishedCollection(ctx, collection)
+	allDel := make([]string, 0)
+	for i := len(collections) - 1; i >= 0; i-- { // loop over from recent to oldest in case content deleted later
+		deletedContent, err := c.GetDeletedContent(ctx, collections[i])
+		if err != nil {
+			return false, err
+		}
+		allDel = append(allDel, deletedContent...)
+
+		colvalid, err := c.CheckPublishedCollection(ctx, collections[i], allDel)
 		if err != nil {
 			return false, err
 		}
@@ -35,11 +55,26 @@ func (c *Checker) CheckPublishedCollections(ctx context.Context) (bool, error) {
 	return valid, nil
 }
 
-func (c *Checker) CheckPublishedCollection(ctx context.Context, collection string) (bool, error) {
+func (c *Checker) GetDeletedContent(ctx context.Context, collection string) ([]string, error) {
+	filename := path.Join(c.ZebedeeRoot, publish_log, collection+".json")
+	deleted := make([]string, 0)
+	col, err := zebedee.GetCollectionFromFile(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, pd := range col.PendingDeletes {
+		deleted = append(deleted, pd.Root.URI)
+	}
+
+	return deleted, nil
+}
+
+func (c *Checker) CheckPublishedCollection(ctx context.Context, collection string, allDeleted allDeleted) (bool, error) {
 	logdata := log.Data{"collection": collection}
 	log.Info(ctx, "checking published collection", logdata)
 
-	valid, err := c.CheckDirsInPublishedCollection(ctx, collection)
+	valid, err := c.CheckDirsInPublishedCollection(ctx, collection, allDeleted)
 	if err != nil {
 		log.Error(ctx, "error while checking dirs in published collection", err, logdata)
 		return false, err
@@ -82,7 +117,7 @@ func (c *Checker) GetPublishedCollections(ctx context.Context) ([]string, error)
 	return collections, nil
 }
 
-func (c *Checker) CheckDirsInPublishedCollection(ctx context.Context, collection string) (bool, error) {
+func (c *Checker) CheckDirsInPublishedCollection(ctx context.Context, collection string, allDeleted allDeleted) (bool, error) {
 	root, err := c.ensureZebedeeRoot()
 	if err != nil {
 		return false, err
@@ -109,7 +144,7 @@ func (c *Checker) CheckDirsInPublishedCollection(ctx context.Context, collection
 			if err != nil {
 				return err
 			}
-			if !inMaster {
+			if !inMaster && !allDeleted.includes(relativePath) {
 				missingDirs = append(missingDirs, relativePath)
 				return filepath.SkipDir // don't bother checking subdirs of missing dirs
 			}

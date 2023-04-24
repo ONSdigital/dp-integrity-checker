@@ -7,7 +7,7 @@ import (
 
 	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/slack-go/slack"
-	
+
 	"github.com/ONSdigital/dp-integrity-checker/checker"
 	"github.com/ONSdigital/dp-integrity-checker/config"
 )

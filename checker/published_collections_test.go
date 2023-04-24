@@ -7,9 +7,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ONSdigital/dp-integrity-checker/checker"
 	"github.com/ONSdigital/log.go/v2/log"
 	. "github.com/smartystreets/goconvey/convey"
+
+	"github.com/ONSdigital/dp-integrity-checker/checker"
 )
 
 func TestCheckPublishedCollections(t *testing.T) {
@@ -29,6 +30,57 @@ func TestCheckPublishedCollections(t *testing.T) {
 			"zebedee/publish-log/2023-02-09-12-13-collection2/somepage/v1",
 			"zebedee/publish-log/2023-02-09-12-13-collection2/somepage/v2",
 		)
+
+		err = addFile(tempZebedeeRoot, "zebedee/publish-log/2023-02-08-08-50-col1test.json", []byte("{}"))
+		So(err, ShouldBeNil)
+		err = addFile(tempZebedeeRoot, "zebedee/publish-log/2023-02-09-12-13-collection2.json", []byte("{}"))
+		So(err, ShouldBeNil)
+
+		chk := checker.Checker{
+			ZebedeeRoot:                tempZebedeeRoot,
+			CheckPublishedPreviousDays: 1,
+		}
+
+		// Override current time in checker package
+		checker.Now = func() time.Time {
+			return time.Date(2023, 2, 9, 11, 0, 0, 0, time.UTC)
+		}
+
+		Convey("When the published collections checker is run", func() {
+			valid, err := chk.CheckPublishedCollections(context.Background())
+
+			Convey("Then the checker should return true", func() {
+				So(err, ShouldBeNil)
+				So(valid, ShouldBeTrue)
+			})
+		})
+	})
+}
+
+func TestCheckPublishedCollections_FalsePositiveDeletedInLaterCollection(t *testing.T) {
+	os.Clearenv()
+	log.SetDestination(io.Discard, io.Discard) // Suppress logs for tests
+
+	Convey("Given a checker on a workspace with content modified then deleted in a later collection", t, func() {
+		tempZebedeeRoot, err := os.MkdirTemp("", "checkertest")
+		So(err, ShouldBeNil)
+		defer os.RemoveAll(tempZebedeeRoot)
+
+		addDirs(tempZebedeeRoot,
+			"zebedee/master/somepage/v1",
+			"zebedee/master/somepage/v2",
+			"zebedee/master/somepage/v3",
+			"zebedee/publish-log/2023-02-08-08-50-col1test/somepage/v1",
+			"zebedee/publish-log/2023-02-08-08-50-col1test/someotherpage",
+			"zebedee/publish-log/2023-02-09-12-13-collection2/somepage/v1",
+			"zebedee/publish-log/2023-02-09-12-13-collection2/somepage/v2",
+		)
+
+		err = addFile(tempZebedeeRoot, "zebedee/publish-log/2023-02-08-08-50-col1test.json", []byte("{}"))
+		So(err, ShouldBeNil)
+		err = addFile(tempZebedeeRoot, "zebedee/publish-log/2023-02-09-12-13-collection2.json",
+			[]byte(`{"pendingDeletes": [{"root": {"uri": "/someotherpage"}}]}`))
+		So(err, ShouldBeNil)
 
 		chk := checker.Checker{
 			ZebedeeRoot:                tempZebedeeRoot,
@@ -66,6 +118,10 @@ func TestCheckPublishedCollections_MissingDir(t *testing.T) {
 			"zebedee/publish-log/2023-02-09-12-13-collection2/somepage/v1",
 			"zebedee/publish-log/2023-02-09-12-13-collection2/somepage/v2",
 		)
+		err = addFile(tempZebedeeRoot, "zebedee/publish-log/2023-02-08-08-50-col1test.json", []byte("{}"))
+		So(err, ShouldBeNil)
+		err = addFile(tempZebedeeRoot, "zebedee/publish-log/2023-02-09-12-13-collection2.json", []byte("{}"))
+		So(err, ShouldBeNil)
 
 		chk := checker.Checker{
 			ZebedeeRoot:                tempZebedeeRoot,
@@ -160,7 +216,7 @@ func TestCheckDirsInPublishedCollection_UndefinedZebedeeRoot(t *testing.T) {
 		chk := checker.Checker{}
 
 		Convey("When CheckDirsInPublishedCollection is run", func() {
-			valid, err := chk.CheckDirsInPublishedCollection(context.Background(), "collection1")
+			valid, err := chk.CheckDirsInPublishedCollection(context.Background(), "collection1", []string{})
 
 			Convey("Then the function should return false with an error", func() {
 				So(valid, ShouldBeFalse)

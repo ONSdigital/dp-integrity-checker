@@ -8,9 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ONSdigital/dp-integrity-checker/checker"
 	"github.com/ONSdigital/log.go/v2/log"
 	. "github.com/smartystreets/goconvey/convey"
+
+	"github.com/ONSdigital/dp-integrity-checker/checker"
 )
 
 func TestRun_Unreadable(t *testing.T) {
@@ -110,6 +111,11 @@ func TestRun_MissingDirInMasterForPublishedCollection(t *testing.T) {
 			"zebedee/publish-log/2023-02-09-12-13-collection2/somepage/v2",
 		)
 
+		err = addFile(tempZebedeeRoot, "zebedee/publish-log/2023-02-08-08-50-col1test.json", []byte("{}"))
+		So(err, ShouldBeNil)
+		err = addFile(tempZebedeeRoot, "zebedee/publish-log/2023-02-09-12-13-collection2.json", []byte("{}"))
+		So(err, ShouldBeNil)
+
 		chk := checker.Checker{
 			ZebedeeRoot: tempZebedeeRoot,
 		}
@@ -135,12 +141,14 @@ func TestRun_MissingDirInMasterForPublishedCollection(t *testing.T) {
 
 func addDirs(ws string, dirs ...string) {
 	for _, dir := range dirs {
-		os.MkdirAll(path.Join(ws, dir), 0750)
+		err := os.MkdirAll(path.Join(ws, dir), 0750)
+		So(err, ShouldBeNil)
 	}
 }
 
 func addFile(ws, fpath string, body []byte) error {
 	dir := path.Dir(fpath)
-	os.MkdirAll(path.Join(ws, dir), 0750)
+	err := os.MkdirAll(path.Join(ws, dir), 0750)
+	So(err, ShouldBeNil)
 	return os.WriteFile(path.Join(ws, fpath), body, 0644)
 }
