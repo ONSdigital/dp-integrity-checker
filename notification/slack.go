@@ -41,6 +41,8 @@ func (n *SlackNotifier) SendCheckerResult(ctx context.Context, result *checker.R
 		attachmentText.WriteRune('\n')
 	}
 
+	attachmentText.WriteString("Please refer to <https://github.com/ONSdigital/dp-operations/blob/main/alerts/IntegrityChecker.md|IntegrityChecker> solution to fix this issue.")
+
 	attachment := slack.Attachment{
 		Pretext: fmt.Sprintf("Found %d inconsistencies during integrity check\n", len(result.Inconsistencies)),
 		Text:    attachmentText.String(),
