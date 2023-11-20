@@ -43,7 +43,7 @@ job "dp-integrity-checker" {
             type     = "bind"
             target   = "/content"
             source   = "/var/florence"
-            readonly = false
+            readonly = true
           }
         ]
       }
