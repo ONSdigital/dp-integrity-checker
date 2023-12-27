@@ -4,7 +4,7 @@ job "dp-integrity-checker" {
   type        = "batch"
 
   periodic {
-    cron             = "0 0 1 * * * *"
+    cron             = "0 45 1,6-18 * * * *"
     time_zone        = "UTC"
     prohibit_overlap = true
   }
