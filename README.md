@@ -2,7 +2,7 @@
 
 Periodic nomad job for checking integrity of zebedee workspace
 
-### Getting started
+## Getting started
 
 * Run `make debug`
 
@@ -28,13 +28,12 @@ enabled.
 NB. For developers the zebedee root is usually specified in the lowercase `zebedee_root` env so this service aliases
 this in the `make debug` target to make local development more straightforward.
 
-### Contributing
+## Contributing
 
 See [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-### License
+## License
 
-Copyright © 2023, Office for National Statistics (https://www.ons.gov.uk)
+Copyright © 2023, Office for National Statistics <https://www.ons.gov.uk>
 
 Released under MIT license, see [LICENSE](LICENSE.md) for details.
-
