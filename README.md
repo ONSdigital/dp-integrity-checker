@@ -10,6 +10,14 @@ Periodic nomad job for checking integrity of zebedee workspace
 
 * No further dependencies other than those defined in `go.mod`
 
+### Tools
+
+To run some of our tests you will need additional tooling:
+
+#### Audit
+
+We use `dis-vulncheck` to do auditing, which you will [need to install](https://github.com/ONSdigital/dis-vulncheck).
+
 ### Configuration
 
 | Environment variable          | Default             | Description                                                |
