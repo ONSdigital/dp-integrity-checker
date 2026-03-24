@@ -1,6 +1,6 @@
 module github.com/ONSdigital/dp-integrity-checker
 
-go 1.26.1
+go 1.26.0
 
 require (
 	github.com/ONSdigital/log.go/v2 v2.5.2
